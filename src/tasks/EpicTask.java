@@ -5,24 +5,14 @@ import java.util.List;
 import java.util.UUID;
 
 public class EpicTask extends Task {
-    private List<UUID> subTaskIds;
-
-    public EpicTask(UUID id, String name, String description, TaskStatus taskStatus, List<UUID> subTaskIds) {
-        super(id, name, description, taskStatus);
-        this.subTaskIds = subTaskIds;
-    }
+    private final List<UUID> subTaskIds = new ArrayList<>();
 
     public EpicTask(UUID id, String name, String description) {
         super(id, name, description, TaskStatus.NEW);
-        this.subTaskIds = new ArrayList<>();
     }
 
     public List<UUID> getSubTaskIds() {
         return subTaskIds;
-    }
-
-    public void setSubTaskIds(List<UUID> subTaskIds) {
-        this.subTaskIds = subTaskIds;
     }
 
     public void addSubTaskId(UUID id) {
@@ -33,6 +23,11 @@ public class EpicTask extends Task {
 
     public void removeSubTaskId(UUID id) {
         subTaskIds.remove(id);
+    }
+
+    public void clearSubTaskIds() {
+        subTaskIds.clear();
+        super.setTaskStatus(TaskStatus.NEW);
     }
 
     @Override
