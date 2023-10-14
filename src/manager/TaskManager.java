@@ -16,12 +16,16 @@ public class TaskManager {
     private final HashMap<UUID, SubTask> subTasks = new HashMap<>();
 
     public Task addTask(Task task) {
+        UUID id = UUID.randomUUID();
+        task.setId(id);
         tasks.put(task.getId(), task);
         return task;
     }
 
     public Task updateTask(Task task) {
-        tasks.put(task.getId(), task);
+        if (tasks.containsKey(task.getId())) {
+            tasks.put(task.getId(), task);
+        }
         return task;
     }
 
@@ -47,26 +51,30 @@ public class TaskManager {
     }
 
     public SubTask addSubTask(SubTask subTask) {
-        UUID subTaskId = subTask.getId();
+        UUID subTaskId = UUID.randomUUID();
+        subTask.setId(subTaskId);
         subTasks.put(subTaskId, subTask);
         EpicTask epic = epicTasks.get(subTask.getEpicId());
-        epic.addSubTaskId(subTaskId);
+        if (epic != null) {
+            epic.addSubTaskId(subTaskId);
+            recalculateEpicStatus(epic);
+        } else {
+            throw new RuntimeException("There is no epic for this subtask!");
+        }
         return subTask;
     }
 
     public SubTask updateSubTask(SubTask subTask) {
         UUID subTaskId = subTask.getId();
-        SubTask nonModifiedSubTask = subTasks.get(subTaskId);
-        subTasks.put(subTaskId, subTask);
-
-        EpicTask newEpic = epicTasks.get(subTask.getEpicId());
-        if (!nonModifiedSubTask.getEpicId().equals(subTask.getEpicId())) {
-            EpicTask oldEpic = epicTasks.get(nonModifiedSubTask.getEpicId());
-            oldEpic.removeSubTaskId(subTaskId);
-            newEpic.addSubTaskId(subTaskId);
+        if (subTasks.containsKey(subTaskId)) {
+            subTasks.put(subTaskId, subTask);
         }
-
-        recalculateEpicStatus(newEpic);
+        EpicTask epic = epicTasks.get(subTask.getEpicId());
+        if (epic != null) {
+            recalculateEpicStatus(epic);
+        } else {
+            throw new RuntimeException("There is no epic for this subtask!");
+        }
         return subTask;
     }
 
@@ -77,14 +85,17 @@ public class TaskManager {
             if (epicTasks.containsKey(relatedEpicId)) {
                 EpicTask relatedEpic = epicTasks.get(relatedEpicId);
                 relatedEpic.removeSubTaskId(id);
+                recalculateEpicStatus(relatedEpic);
             }
             subTasks.remove(id);
         }
     }
 
     public void clearSubTaskLists() {
-        for (UUID id : subTasks.keySet()) {
-            removeSubTaskById(id);
+        subTasks.clear();
+        for (EpicTask epic : epicTasks.values()) {
+            epic.clearSubTaskIds();
+            recalculateEpicStatus(epic);
         }
     }
 
@@ -100,12 +111,16 @@ public class TaskManager {
     }
 
     public EpicTask addEpicTask(EpicTask epicTask) {
+        UUID id = UUID.randomUUID();
+        epicTask.setId(id);
         epicTasks.put(epicTask.getId(), epicTask);
         return epicTask;
     }
 
     public EpicTask updateEpicTask(EpicTask epicTask) {
-        epicTasks.put(epicTask.getId(), epicTask);
+        if (epicTasks.containsKey(epicTask.getId())) {
+            epicTasks.put(epicTask.getId(), epicTask);
+        }
         return epicTask;
     }
 
@@ -120,18 +135,15 @@ public class TaskManager {
     }
 
     public void clearEpicTaskLists() {
-        for (UUID id : epicTasks.keySet()) {
-            removeEpicTaskById(id);
-        }
+        epicTasks.clear();
+        subTasks.clear();
     }
 
     public EpicTask getEpicTaskById(UUID id) {
         if (id == null) {
             throw new RuntimeException("Provided id is null");
         }
-        EpicTask epic = epicTasks.get(id);
-        recalculateEpicStatus(epic);
-        return epic;
+        return epicTasks.get(id);
     }
 
     public List<SubTask> getSubtasksOfEpic(UUID epicId) {
@@ -147,12 +159,7 @@ public class TaskManager {
     }
 
     public List<EpicTask> getAllEpics() {
-        List<EpicTask> epics = new ArrayList<>();
-        for (UUID id : epicTasks.keySet()) {
-            EpicTask epicTask = getEpicTaskById(id);
-            epics.add(epicTask);
-        }
-        return epics;
+        return new ArrayList<>(epicTasks.values());
     }
 
     private void recalculateEpicStatus(EpicTask epic) {

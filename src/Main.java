@@ -4,30 +4,29 @@ import tasks.SubTask;
 import tasks.Task;
 import tasks.TaskStatus;
 
-import java.util.UUID;
-
 public class Main {
 
     public static void main(String[] args) {
 
         TaskManager testManager = new TaskManager();
 
-        Task firstTask = new Task(UUID.randomUUID(), "First task", "Some first task", TaskStatus.NEW);
-        Task secondTask = new Task(UUID.randomUUID(), "Second task", "Some second task",
+        Task firstTask = new Task("First task", "Some first task", TaskStatus.NEW);
+        Task secondTask = new Task("Second task", "Some second task",
                 TaskStatus.NEW);
-        EpicTask firstEpic = new EpicTask(UUID.randomUUID(), "First epic", "Some first Epic");
-        EpicTask secondEpic = new EpicTask(UUID.randomUUID(), "Second epic", "Some second Epic");
-        SubTask firstSubTask = new SubTask(UUID.randomUUID(), "First subtask",
-                "FirstSubTask description", TaskStatus.NEW, firstEpic.getId());
-        SubTask secondSubTask = new SubTask(UUID.randomUUID(), "Second subtask",
-                "SecondSubTask description", TaskStatus.NEW, firstEpic.getId());
-        SubTask thirdSubTask = new SubTask(UUID.randomUUID(), "Third subtask",
-                "ThirdSubTask description", TaskStatus.NEW, secondEpic.getId());
-
         testManager.addTask(firstTask);
         testManager.addTask(secondTask);
+
+        EpicTask firstEpic = new EpicTask("First epic", "Some first Epic");
+        EpicTask secondEpic = new EpicTask("Second epic", "Some second Epic");
         testManager.addEpicTask(firstEpic);
         testManager.addEpicTask(secondEpic);
+
+        SubTask firstSubTask = new SubTask("First subtask",
+                "FirstSubTask description", TaskStatus.NEW, firstEpic.getId());
+        SubTask secondSubTask = new SubTask("Second subtask",
+                "SecondSubTask description", TaskStatus.NEW, firstEpic.getId());
+        SubTask thirdSubTask = new SubTask("Third subtask",
+                "ThirdSubTask description", TaskStatus.NEW, secondEpic.getId());
         testManager.addSubTask(firstSubTask);
         testManager.addSubTask(secondSubTask);
         testManager.addSubTask(thirdSubTask);

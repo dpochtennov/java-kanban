@@ -10,6 +10,10 @@ public class EpicTask extends Task {
     public EpicTask(UUID id, String name, String description) {
         super(id, name, description, TaskStatus.NEW);
     }
+    
+    public EpicTask(String name, String description) {
+        super(name, description, TaskStatus.NEW);
+    }
 
     public List<UUID> getSubTaskIds() {
         return subTaskIds;

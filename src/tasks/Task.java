@@ -3,13 +3,19 @@ package tasks;
 import java.util.UUID;
 
 public class Task {
-    private final UUID id;
+    private UUID id;
     private String name;
     private String description;
     private TaskStatus taskStatus;
 
     public Task(UUID id, String name, String description, TaskStatus taskStatus) {
         this.id = id;
+        this.name = name;
+        this.description = description;
+        this.taskStatus = taskStatus;
+    }
+
+    public Task(String name, String description, TaskStatus taskStatus) {
         this.name = name;
         this.description = description;
         this.taskStatus = taskStatus;
@@ -33,6 +39,10 @@ public class Task {
 
     public UUID getId() {
         return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public TaskStatus getTaskStatus() {
