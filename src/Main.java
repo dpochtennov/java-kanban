@@ -1,14 +1,17 @@
+import manager.Managers;
 import manager.TaskManager;
 import tasks.EpicTask;
 import tasks.SubTask;
 import tasks.Task;
 import tasks.TaskStatus;
 
+import java.util.List;
+
 public class Main {
 
     public static void main(String[] args) {
 
-        TaskManager testManager = new TaskManager();
+        TaskManager testManager = Managers.getDefault();
 
         Task firstTask = new Task("First task", "Some first task", TaskStatus.NEW);
         Task secondTask = new Task("Second task", "Some second task",
@@ -64,6 +67,15 @@ public class Main {
         firstEpicTaskUpdated.addSubTaskId(secondSubTaskUpdated.getId());
         testManager.updateEpicTask(firstEpicTaskUpdated);
         System.out.println("Epics: " + testManager.getAllEpics());
+
+        System.out.println();
+        System.out.println("Check getHistory logic");
+        testManager.getTaskById(firstTaskUpdated.getId());
+        testManager.getSubTaskById(firstSubTask.getId());
+        testManager.getEpicTaskById(firstEpic.getId());
+        List<Task> history = testManager.getHistory();
+        System.out.println(history);
+        System.out.println();
 
         System.out.println();
         System.out.println("Check removeTaskById method");

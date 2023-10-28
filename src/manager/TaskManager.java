@@ -3,195 +3,160 @@ package manager;
 import tasks.EpicTask;
 import tasks.SubTask;
 import tasks.Task;
-import tasks.TaskStatus;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class TaskManager {
-    private final HashMap<UUID, Task> tasks = new HashMap<>();
-    private final HashMap<UUID, EpicTask> epicTasks = new HashMap<>();
-    private final HashMap<UUID, SubTask> subTasks = new HashMap<>();
+/**
+ * Interface for Task Manager
+ *
+ * @author Dmitrii Pochtennov
+ * @version 1.0
+ * @since 2023-10-28
+ */
+public interface TaskManager {
 
-    public Task addTask(Task task) {
-        UUID id = UUID.randomUUID();
-        task.setId(id);
-        tasks.put(task.getId(), task);
-        return task;
-    }
+    /**
+     * This method adds Task to the current task storage.
+     *
+     * @param task Task object.
+     * @return Task returns saved to current storage Task object.
+     */
+    Task addTask(Task task);
 
-    public Task updateTask(Task task) {
-        if (tasks.containsKey(task.getId())) {
-            tasks.put(task.getId(), task);
-        }
-        return task;
-    }
+    /**
+     * This method updates Task in the current task storage.
+     *
+     * @param task Task object.
+     * @return Task returns updated in the current storage Task object.
+     */
+    Task updateTask(Task task);
 
-    public void removeTaskById(UUID id) {
-        if (id != null) {
-            tasks.remove(id);
-        }
-    }
+    /**
+     * This method removes Task by its ID from the current task storage.
+     *
+     * @param id id of the task.
+     */
+    void removeTaskById(UUID id);
 
-    public void clearTaskList() {
-        tasks.clear();
-    }
+    /**
+     * Clears current task storage.
+     */
+    void clearTaskList();
 
-    public Task getTaskById(UUID id) {
-        if (id == null) {
-            throw new RuntimeException("Provided id is null");
-        }
-        return tasks.get(id);
-    }
+    /**
+     * This method returns Task by its ID from the current task storage.
+     *
+     * @param id id of the task.
+     * @return Task by its id.
+     */
+    Task getTaskById(UUID id);
 
-    public List<Task> getAllTasks() {
-        return new ArrayList<>(tasks.values());
-    }
+    /**
+     * This method returns all tasks from the current task storage.
+     *
+     * @return List<Task> list of tasks.
+     */
+    List<Task> getAllTasks();
 
-    public SubTask addSubTask(SubTask subTask) {
-        UUID subTaskId = UUID.randomUUID();
-        subTask.setId(subTaskId);
-        subTasks.put(subTaskId, subTask);
-        EpicTask epic = epicTasks.get(subTask.getEpicId());
-        if (epic != null) {
-            epic.addSubTaskId(subTaskId);
-            recalculateEpicStatus(epic);
-        } else {
-            throw new RuntimeException("There is no epic for this subtask!");
-        }
-        return subTask;
-    }
+    /**
+     * This method adds SubTask to the current SubTask storage.
+     *
+     * @param subTask SubTask object.
+     * @return SubTask returns saved to current storage SubTask object.
+     */
+    SubTask addSubTask(SubTask subTask);
 
-    public SubTask updateSubTask(SubTask subTask) {
-        UUID subTaskId = subTask.getId();
-        if (subTasks.containsKey(subTaskId)) {
-            subTasks.put(subTaskId, subTask);
-        }
-        EpicTask epic = epicTasks.get(subTask.getEpicId());
-        if (epic != null) {
-            recalculateEpicStatus(epic);
-        } else {
-            throw new RuntimeException("There is no epic for this subtask!");
-        }
-        return subTask;
-    }
+    /**
+     * This method updates SubTask in the current SubTask storage.
+     *
+     * @param subTask SubTask object.
+     * @return SubTask returns updated in the current storage SubTask object.
+     */
+    SubTask updateSubTask(SubTask subTask);
 
-    public void removeSubTaskById(UUID id) {
-        if (id != null && subTasks.containsKey(id)) {
-            SubTask subTask = subTasks.get(id);
-            UUID relatedEpicId = subTask.getEpicId();
-            if (epicTasks.containsKey(relatedEpicId)) {
-                EpicTask relatedEpic = epicTasks.get(relatedEpicId);
-                relatedEpic.removeSubTaskId(id);
-                recalculateEpicStatus(relatedEpic);
-            }
-            subTasks.remove(id);
-        }
-    }
+    /**
+     * This method removes SubTask by its ID from the current SubTask storage.
+     *
+     * @param id id of the task.
+     */
+    void removeSubTaskById(UUID id);
 
-    public void clearSubTaskLists() {
-        subTasks.clear();
-        for (EpicTask epic : epicTasks.values()) {
-            epic.clearSubTaskIds();
-            recalculateEpicStatus(epic);
-        }
-    }
+    /**
+     * Clears current SubTask storage.
+     */
+    void clearSubTaskLists();
 
-    public SubTask getSubTaskById(UUID id) {
-        if (id == null) {
-            throw new RuntimeException("Provided id is null");
-        }
-        return subTasks.get(id);
-    }
+    /**
+     * This method returns SubTask by its ID from the current task storage.
+     *
+     * @param id id of the SubTask.
+     * @return SubTask by its id.
+     */
+    SubTask getSubTaskById(UUID id);
 
-    public List<SubTask> getAllSubTasks() {
-        return new ArrayList<>(subTasks.values());
-    }
+    /**
+     * This method returns all SubTasks from the current SubTask storage.
+     *
+     * @return List<SubTask> list of subtasks.
+     */
+    List<SubTask> getAllSubTasks();
 
-    public EpicTask addEpicTask(EpicTask epicTask) {
-        UUID id = UUID.randomUUID();
-        epicTask.setId(id);
-        epicTasks.put(epicTask.getId(), epicTask);
-        return epicTask;
-    }
+    /**
+     * This method adds EpicTask to the current task storage.
+     *
+     * @param epicTask EpicTask object.
+     * @return EpicTask returns saved to current storage EpicTask object.
+     */
+    EpicTask addEpicTask(EpicTask epicTask);
 
-    public EpicTask updateEpicTask(EpicTask epicTask) {
-        if (epicTasks.containsKey(epicTask.getId())) {
-            epicTasks.put(epicTask.getId(), epicTask);
-        }
-        return epicTask;
-    }
+    /**
+     * This method updates EpicTask in the current task storage.
+     *
+     * @param epicTask EpicTask object.
+     * @return EpicTask returns updated in the current storage EpicTask object.
+     */
+    EpicTask updateEpicTask(EpicTask epicTask);
 
-    public void removeEpicTaskById(UUID id) {
-        if (id != null && epicTasks.containsKey(id)) {
-            EpicTask epic = epicTasks.get(id);
-            for (UUID subTaskId : epic.getSubTaskIds()) {
-                subTasks.remove(subTaskId);
-            }
-            epicTasks.remove(id);
-        }
-    }
+    /**
+     * This method removes EpicTask by its ID from the current EpicTask storage.
+     *
+     * @param id id of the EpicTask.
+     */
+    void removeEpicTaskById(UUID id);
 
-    public void clearEpicTaskLists() {
-        epicTasks.clear();
-        subTasks.clear();
-    }
+    /**
+     * Clears current EpicTask storage.
+     */
+    void clearEpicTaskLists();
 
-    public EpicTask getEpicTaskById(UUID id) {
-        if (id == null) {
-            throw new RuntimeException("Provided id is null");
-        }
-        return epicTasks.get(id);
-    }
+    /**
+     * This method returns EpicTask by its ID from the current EpicTask storage.
+     *
+     * @param id id of the EpicTask.
+     * @return EpicTask by its id.
+     */
+    EpicTask getEpicTaskById(UUID id);
 
-    public List<SubTask> getSubtasksOfEpic(UUID epicId) {
-        if (epicId == null) {
-            return new ArrayList<>();
-        }
-        List<SubTask> epicsSubTasks = new ArrayList<>();
-        EpicTask epic = epicTasks.get(epicId);
-        for (UUID subTaskId : epic.getSubTaskIds()) {
-            epicsSubTasks.add(subTasks.get(subTaskId));
-        }
-        return epicsSubTasks;
-    }
+    /**
+     * This method returns all SubTasks for the EpicTask by epicId.
+     *
+     * @param epicId id of the EpicTask
+     * @return List<SubTask> list of subtasks of the epic.
+     */
+    List<SubTask> getSubtasksOfEpic(UUID epicId);
 
-    public List<EpicTask> getAllEpics() {
-        return new ArrayList<>(epicTasks.values());
-    }
+    /**
+     * This method returns all EpicTasks from the current EpicTask storage.
+     *
+     * @return List<EpicTask> list of epics.
+     */
+    List<EpicTask> getAllEpics();
 
-    private void recalculateEpicStatus(EpicTask epic) {
-        boolean isNew = true;
-        boolean isDone = true;
-
-        List<UUID> subTaskIds = epic.getSubTaskIds();
-
-        if (subTaskIds.isEmpty()) {
-            epic.setTaskStatus(TaskStatus.NEW);
-            return;
-        }
-
-        for (UUID subTaskId : subTaskIds) {
-            SubTask subTask = subTasks.get(subTaskId);
-            TaskStatus subTaskStatus = subTask.getTaskStatus();
-
-            if (!subTaskStatus.equals(TaskStatus.NEW)) {
-                isNew = false;
-            }
-
-            if (!subTaskStatus.equals(TaskStatus.DONE)) {
-                isDone = false;
-            }
-        }
-
-        if (isNew) {
-            epic.setTaskStatus(TaskStatus.NEW);
-        } else if (isDone) {
-            epic.setTaskStatus(TaskStatus.DONE);
-        } else {
-            epic.setTaskStatus(TaskStatus.IN_PROGRESS);
-        }
-    }
+    /**
+     * Returns history of 10 last task retrieval operations.
+     *
+     * @return List<Task> history of last 10 retrieval operations.
+     */
+    List<Task> getHistory();
 }
