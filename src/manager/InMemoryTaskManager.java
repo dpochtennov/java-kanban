@@ -8,17 +8,14 @@ import tasks.TaskStatus;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final HashMap<UUID, Task> tasks = new HashMap<>();
-    private final HashMap<UUID, EpicTask> epicTasks = new HashMap<>();
-    private final HashMap<UUID, SubTask> subTasks = new HashMap<>();
-    private final HistoryManager historyManager;
-
-    public InMemoryTaskManager(HistoryManager historyManager) {
-        this.historyManager = historyManager;
-    }
+    private final Map<UUID, Task> tasks = new HashMap<>();
+    private final Map<UUID, EpicTask> epicTasks = new HashMap<>();
+    private final Map<UUID, SubTask> subTasks = new HashMap<>();
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
     public Task addTask(Task task) {

@@ -15,8 +15,7 @@ public class Managers {
      * @return TaskManager This method returns default InMemory task Manager
      */
     public static TaskManager getDefault() {
-        HistoryManager inMemoryHistoryManager = getDefaultHistory();
-        return new InMemoryTaskManager(inMemoryHistoryManager);
+        return new InMemoryTaskManager();
     }
 
     /**
