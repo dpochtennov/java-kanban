@@ -3,6 +3,7 @@ package manager;
 import tasks.Task;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Interface for History Manager
@@ -25,4 +26,12 @@ public interface HistoryManager {
      * @return List<Task> returns tasks which were viewed by user.
      */
     List<Task> getHistory();
+
+    /**
+     * This method removes task with a provided id from history.
+     *
+     * @param id id of the task to remove.
+     * @return does not return anything.
+     */
+    void remove(UUID id);
 }

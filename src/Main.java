@@ -71,8 +71,12 @@ public class Main {
         System.out.println();
         System.out.println("Check getHistory logic");
         testManager.getTaskById(firstTaskUpdated.getId());
+        testManager.getTaskById(firstTaskUpdated.getId());
+        testManager.getSubTaskById(firstSubTask.getId());
         testManager.getSubTaskById(firstSubTask.getId());
         testManager.getEpicTaskById(firstEpic.getId());
+        testManager.getEpicTaskById(firstEpic.getId());
+        testManager.getTaskById(firstTaskUpdated.getId());
         List<Task> history = testManager.getHistory();
         System.out.println(history);
         System.out.println();
@@ -81,34 +85,46 @@ public class Main {
         System.out.println("Check removeTaskById method");
         testManager.removeTaskById(firstTaskUpdated.getId());
         System.out.println("Tasks: " + testManager.getAllTasks());
+        System.out.println("History: " + testManager.getHistory());
 
         System.out.println();
         System.out.println("Check removeSubTaskById method");
         testManager.removeSubTaskById(firstSubTaskUpdated.getId());
         System.out.println("SubTasks: " + testManager.getAllSubTasks());
         System.out.println("Epics: " + testManager.getAllEpics());
+        System.out.println("History: " + testManager.getHistory());
 
         System.out.println();
         System.out.println("Check removeEpicById method");
         testManager.removeEpicTaskById(firstEpic.getId());
         System.out.println("SubTasks: " + testManager.getAllSubTasks());
         System.out.println("Epics: " + testManager.getAllEpics());
+        System.out.println("History: " + testManager.getHistory());
 
         System.out.println();
         System.out.println("Check clearTaskList method");
+        testManager.getTaskById(secondTask.getId());
+        System.out.println("History before clear: " + testManager.getHistory());
         testManager.clearTaskList();
         System.out.println("Tasks: " + testManager.getAllTasks());
+        System.out.println("History after clear: " + testManager.getHistory());
 
         System.out.println();
         System.out.println("Check clearSubTaskList method");
+        testManager.getSubTaskById(thirdSubTask.getId());
+        System.out.println("History before clear: " + testManager.getHistory());
         testManager.clearSubTaskLists();
         System.out.println("SubTasks: " + testManager.getAllSubTasks());
         System.out.println("Epics: " + testManager.getAllEpics());
+        System.out.println("History after clear: " + testManager.getHistory());
 
         System.out.println();
         System.out.println("Check clearEpicTaskList method");
+        testManager.getEpicTaskById(secondEpic.getId());
+        System.out.println("History before clear: " + testManager.getHistory());
         testManager.clearEpicTaskLists();
         System.out.println("SubTasks: " + testManager.getAllSubTasks());
         System.out.println("Epics: " + testManager.getAllEpics());
+        System.out.println("History after clear: " + testManager.getHistory());
     }
 }

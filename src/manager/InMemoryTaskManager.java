@@ -7,8 +7,10 @@ import tasks.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -37,11 +39,15 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeTaskById(UUID id) {
         if (id != null) {
             tasks.remove(id);
+            historyManager.remove(id);
         }
     }
 
     @Override
     public void clearTaskList() {
+        for (UUID taskId : tasks.keySet()) {
+            historyManager.remove(taskId);
+        }
         tasks.clear();
     }
 
@@ -101,11 +107,15 @@ public class InMemoryTaskManager implements TaskManager {
                 recalculateEpicStatus(relatedEpic);
             }
             subTasks.remove(id);
+            historyManager.remove(id);
         }
     }
 
     @Override
     public void clearSubTaskLists() {
+        for (UUID taskId : subTasks.keySet()) {
+            historyManager.remove(taskId);
+        }
         subTasks.clear();
         for (EpicTask epic : epicTasks.values()) {
             epic.clearSubTaskIds();
@@ -150,13 +160,21 @@ public class InMemoryTaskManager implements TaskManager {
             EpicTask epic = epicTasks.get(id);
             for (UUID subTaskId : epic.getSubTaskIds()) {
                 subTasks.remove(subTaskId);
+                historyManager.remove(subTaskId);
             }
             epicTasks.remove(id);
+            historyManager.remove(id);
         }
     }
 
     @Override
     public void clearEpicTaskLists() {
+        Set<UUID> idsToDeleteFromHistory = new HashSet<>();
+        idsToDeleteFromHistory.addAll(subTasks.keySet());
+        idsToDeleteFromHistory.addAll(epicTasks.keySet());
+        for (UUID taskId : idsToDeleteFromHistory) {
+            historyManager.remove(taskId);
+        }
         epicTasks.clear();
         subTasks.clear();
     }
