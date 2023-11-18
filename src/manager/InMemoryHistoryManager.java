@@ -9,15 +9,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import static java.util.Collections.reverse;
-
 public class InMemoryHistoryManager implements HistoryManager {
     private final Map<UUID, HistoryNode<Task>> idsToNodeMapper;
     private HistoryNode<Task> head;
+    private HistoryNode<Task> tail;
 
     public InMemoryHistoryManager() {
         idsToNodeMapper = new HashMap<>();
         head = null;
+        tail = null;
     }
 
     @Override
@@ -27,6 +27,9 @@ public class InMemoryHistoryManager implements HistoryManager {
             remove(id);
         }
         HistoryNode<Task> node = new HistoryNode<>(task);
+        if (Objects.isNull(tail)) {
+            tail = node;
+        }
         if (!Objects.isNull(head)) {
             node.setPrev(head);
             head.setNext(node);
@@ -45,14 +48,13 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public List<Task> getHistory() {
         List<Task> result = new ArrayList<>();
-        HistoryNode<Task> currentNode = head;
+        HistoryNode<Task> currentNode = tail;
 
         while (!Objects.isNull(currentNode)) {
             result.add(currentNode.getData());
-            HistoryNode<Task> previousNode = currentNode.getPrev();
-            currentNode = previousNode;
+            HistoryNode<Task> nextNode = currentNode.getNext();
+            currentNode = nextNode;
         }
-        reverse(result);
         return result;
     }
 
@@ -65,6 +67,8 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         if (!Objects.isNull(prevNode)) {
             prevNode.setNext(nextNode);
+        } else {
+            tail = nextNode;
         }
 
         if (!Objects.isNull(nextNode)) {
@@ -76,36 +80,36 @@ public class InMemoryHistoryManager implements HistoryManager {
         nodeToRemove.setNext(null);
         nodeToRemove.setPrev(null);
     }
-}
 
-class HistoryNode<T> {
-    private final T data;
-    private HistoryNode<T> next;
-    private HistoryNode<T> prev;
+    private static class HistoryNode<T> {
+        private final T data;
+        private HistoryNode<T> next;
+        private HistoryNode<T> prev;
 
-    public HistoryNode(T data) {
-        this.data = data;
-        this.next = null;
-        this.prev = null;
-    }
+        HistoryNode(T data) {
+            this.data = data;
+            this.next = null;
+            this.prev = null;
+        }
 
-    public HistoryNode<T> getNext() {
-        return next;
-    }
+        HistoryNode<T> getNext() {
+            return next;
+        }
 
-    public void setNext(HistoryNode<T> historyNode) {
-        this.next = historyNode;
-    }
+        void setNext(HistoryNode<T> historyNode) {
+            this.next = historyNode;
+        }
 
-    public HistoryNode<T> getPrev() {
-        return prev;
-    }
+        HistoryNode<T> getPrev() {
+            return prev;
+        }
 
-    public void setPrev(HistoryNode<T> historyNode) {
-        this.prev = historyNode;
-    }
+        void setPrev(HistoryNode<T> historyNode) {
+            this.prev = historyNode;
+        }
 
-    public T getData() {
-        return data;
+        T getData() {
+            return data;
+        }
     }
 }
