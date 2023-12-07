@@ -5,14 +5,22 @@ import java.util.List;
 import java.util.UUID;
 
 public class EpicTask extends Task {
-    private final List<UUID> subTaskIds = new ArrayList<>();
+    private List<UUID> subTaskIds = new ArrayList<>();
 
     public EpicTask(UUID id, String name, String description) {
         super(id, name, description, TaskStatus.NEW);
+        this.type = TaskTypes.EPIC;
     }
-    
+
     public EpicTask(String name, String description) {
         super(name, description, TaskStatus.NEW);
+        this.type = TaskTypes.EPIC;
+    }
+
+    public EpicTask(UUID id, String name, String description, TaskStatus taskStatus, List<UUID> subTaskIds) {
+        super(id, name, description, taskStatus);
+        this.subTaskIds = subTaskIds;
+        this.type = TaskTypes.EPIC;
     }
 
     public List<UUID> getSubTaskIds() {
@@ -33,16 +41,4 @@ public class EpicTask extends Task {
         subTaskIds.clear();
         super.setTaskStatus(TaskStatus.NEW);
     }
-
-    @Override
-    public String toString() {
-        return "EpicTask{" +
-                "id='" + super.getId() + '\'' +
-                ", name='" + super.getName() + '\'' +
-                ", description='" + super.getDescription() + '\'' +
-                ", subTasksIds='" + subTaskIds + '\'' +
-                ", taskStatus=" + super.getTaskStatus() +
-                '}';
-    }
-
 }

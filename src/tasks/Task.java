@@ -3,6 +3,7 @@ package tasks;
 import java.util.UUID;
 
 public class Task {
+    protected TaskTypes type = TaskTypes.TASK;
     private UUID id;
     private String name;
     private String description;
@@ -55,11 +56,6 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", taskStatus=" + taskStatus +
-                '}';
+        return getId() + "," + type + "," + getName() + "," + getTaskStatus() + "," + getDescription();
     }
 }

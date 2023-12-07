@@ -1,5 +1,7 @@
-package manager;
+package manager.taskManager;
 
+import manager.Managers;
+import manager.historyManager.HistoryManager;
 import tasks.EpicTask;
 import tasks.SubTask;
 import tasks.Task;
@@ -21,9 +23,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task addTask(Task task) {
-        UUID id = UUID.randomUUID();
-        task.setId(id);
-        tasks.put(task.getId(), task);
+        UUID id = task.getId();
+        if (id == null) {
+            id = UUID.randomUUID();
+            task.setId(id);
+        }
+        tasks.put(id, task);
         return task;
     }
 
@@ -68,8 +73,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public SubTask addSubTask(SubTask subTask) {
-        UUID subTaskId = UUID.randomUUID();
-        subTask.setId(subTaskId);
+        UUID subTaskId = subTask.getId();
+        if (subTaskId == null) {
+            subTaskId = UUID.randomUUID();
+            subTask.setId(subTaskId);
+        }
         subTasks.put(subTaskId, subTask);
         EpicTask epic = epicTasks.get(subTask.getEpicId());
         if (epic != null) {
@@ -140,9 +148,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public EpicTask addEpicTask(EpicTask epicTask) {
-        UUID id = UUID.randomUUID();
-        epicTask.setId(id);
-        epicTasks.put(epicTask.getId(), epicTask);
+        UUID epicTaskId = epicTask.getId();
+        if (epicTaskId == null) {
+            epicTaskId = UUID.randomUUID();
+            epicTask.setId(epicTaskId);
+        }
+        epicTasks.put(epicTaskId, epicTask);
         return epicTask;
     }
 
@@ -210,6 +221,19 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
+    }
+
+    public Task getAnyTaskById(UUID id) {
+        Task requiredTask;
+        if (tasks.containsKey(id)) {
+            requiredTask = tasks.get(id);
+        } else if (epicTasks.containsKey(id)) {
+            requiredTask = epicTasks.get(id);
+        } else {
+            requiredTask = subTasks.get(id);
+        }
+        historyManager.add(requiredTask);
+        return requiredTask;
     }
 
     private void recalculateEpicStatus(EpicTask epic) {
