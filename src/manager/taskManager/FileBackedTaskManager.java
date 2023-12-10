@@ -23,6 +23,8 @@ import static java.util.stream.Collectors.toList;
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private static final String COMMA_DELIMITER = ",";
+    private static final String HEADER_LINE = "id,type,name,status,description,epic";
+    private static final String LINE_SEPARATOR = System.lineSeparator();
     private static final int ID_POSITION = 0;
     private static final int NAME_POSITION = 2;
     private static final int STATUS_POSITION = 3;
@@ -47,12 +49,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         List<String> records = readFile(file);
         List<Task> tasks = serializeTasks(records);
         for (Task task : tasks) {
-            if (task instanceof EpicTask) {
-                manager.addEpicTask((EpicTask) task);
-            } else if (task instanceof SubTask) {
-                manager.addSubTask((SubTask) task);
-            } else {
-                manager.addTask(task);
+            switch (task.getType()) {
+                case SUBTASK: {
+                    manager.addSubTask((SubTask) task);
+                    break;
+                }
+                case EPIC: {
+                    manager.addEpicTask((EpicTask) task);
+                    break;
+                }
+                case TASK: {
+                    manager.addTask(task);
+                    break;
+                }
+                default: {
+                    throw new RuntimeException("Incorrect task type: " + task);
+                }
             }
         }
         List<UUID> history = getHistory(records);
@@ -65,14 +77,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public static void main(String[] args) {
         File tasks = new File("src/files/tasks.csv");
 
-        System.out.println("Check that tasks from file are read correctly (and saved also)\n");
+        System.out.println("Check that tasks from file are read correctly (and saved also)" + LINE_SEPARATOR);
         TaskManager manager = FileBackedTaskManager.loadFromFile(tasks);
         System.out.println(manager.getAllTasks());
         System.out.println(manager.getAllEpics());
         System.out.println(manager.getAllSubTasks());
         System.out.println(manager.getHistory());
 
-        System.out.println("Check that file is updated when we add some tasks via second manager\n");
+        System.out.println("Check that file is updated when we add some tasks via second manager" + LINE_SEPARATOR);
         Task newTask = new Task("New task", "Some new task", TaskStatus.NEW);
         manager.addTask(newTask);
         EpicTask newEpic = new EpicTask("New epic", "Some new Epic");
@@ -103,7 +115,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException exception) {
             throw new ManagerReadException("Cannot read file: " + exception.getMessage());
         }
-        return records;
+        return records.subList(1, records.size());
     }
 
     private static List<Task> serializeTasks(List<String> records) {
@@ -129,7 +141,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         List<UUID> history = new ArrayList<>();
         if (!records.isEmpty()) {
             String lastRow = records.get(records.size() - 1);
-            history = getUUIDsFromString(lastRow);
+            if (!lastRow.isEmpty()) {
+                history = getUUIDsFromString(lastRow);
+            }
         }
         return history;
     }
@@ -155,8 +169,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 List<UUID> subTaskIds = new ArrayList<>();
                 return new EpicTask(id, name, description, status, subTaskIds);
             }
-            default: {
+            case TASK: {
                 return new Task(id, name, description, status);
+            }
+            default: {
+                throw new RuntimeException("Incorrect task type in the line: " + line);
             }
         }
     }
@@ -265,16 +282,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         List<EpicTask> epics = super.getAllEpics();
         List<SubTask> subTasks = super.getAllSubTasks();
         try (FileWriter fw = new FileWriter(tasksFile, false)) {
+            fw.write(HEADER_LINE + LINE_SEPARATOR);
             for (Task task : tasks) {
-                fw.write(task.toString() + "\n");
+                fw.write(task.toString() + LINE_SEPARATOR);
             }
             for (Task epic : epics) {
-                fw.write(epic.toString() + "\n");
+                fw.write(epic.toString() + LINE_SEPARATOR);
             }
             for (Task subTask : subTasks) {
-                fw.write(subTask.toString() + "\n");
+                fw.write(subTask.toString() + LINE_SEPARATOR);
             }
-            fw.write("\n");
+            fw.write(LINE_SEPARATOR);
             String history = historyToString();
             fw.write(history);
         } catch (IOException exception) {

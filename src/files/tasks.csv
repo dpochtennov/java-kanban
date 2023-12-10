@@ -1,3 +1,4 @@
+id,type,name,status,description,epic
 123e4567-e89b-12d3-a456-556642440000,TASK,Task1,NEW,Description task1
 123e4567-e89b-12d3-a456-556642440312,EPIC,Epic2,DONE,Description epic2
 123e4567-e89b-12d3-a456-556642440884,SUBTASK,Sub Task2,DONE,Description sub task3,123e4567-e89b-12d3-a456-556642440312

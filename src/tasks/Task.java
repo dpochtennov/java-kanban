@@ -54,6 +54,10 @@ public class Task {
         this.taskStatus = taskStatus;
     }
 
+    public TaskTypes getType() {
+        return type;
+    }
+
     @Override
     public String toString() {
         return getId() + "," + type + "," + getName() + "," + getTaskStatus() + "," + getDescription();
