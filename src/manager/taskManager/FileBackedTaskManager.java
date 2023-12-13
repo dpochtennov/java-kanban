@@ -277,6 +277,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return epic;
     }
 
+    @Override
+    public Task getAnyTaskById(UUID id) {
+        Task task = super.getAnyTaskById(id);
+        save();
+        return task;
+    }
+
     private void save() {
         List<Task> tasks = super.getAllTasks();
         List<EpicTask> epics = super.getAllEpics();
