@@ -1,8 +1,8 @@
-package manager.taskManager;
+package main.manager.taskManager;
 
-import tasks.EpicTask;
-import tasks.SubTask;
-import tasks.Task;
+import main.tasks.EpicTask;
+import main.tasks.SubTask;
+import main.tasks.Task;
 
 import java.util.List;
 import java.util.UUID;
@@ -53,9 +53,9 @@ public interface TaskManager {
     Task getTaskById(UUID id);
 
     /**
-     * This method returns all tasks from the current task storage.
+     * This method returns all main.tasks from the current task storage.
      *
-     * @return List<Task> list of tasks.
+     * @return List<Task> list of main.tasks.
      */
     List<Task> getAllTasks();
 

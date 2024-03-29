@@ -1,12 +1,12 @@
-package manager.taskManager;
+package main.manager.taskManager;
 
-import customExceptions.ManagerReadException;
-import customExceptions.ManagerSaveException;
-import tasks.EpicTask;
-import tasks.SubTask;
-import tasks.Task;
-import tasks.TaskStatus;
-import tasks.TaskTypes;
+import main.customExceptions.ManagerReadException;
+import main.customExceptions.ManagerSaveException;
+import main.tasks.EpicTask;
+import main.tasks.SubTask;
+import main.tasks.Task;
+import main.tasks.TaskStatus;
+import main.tasks.TaskTypes;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,10 +38,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     /**
-     * This static method reads content of csv file where tasks are stored and returns TaskManager
+     * This static method reads content of csv file where main.tasks are stored and returns TaskManager
      * which works with that file.
      *
-     * @param file csv file where tasks are stored.
+     * @param file csv file where main.tasks are stored.
      * @return FileBackedTaskManager TaskManager which works with csv file.
      */
     public static FileBackedTaskManager loadFromFile(File file) {
@@ -75,16 +75,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static void main(String[] args) {
-        File tasks = new File("src/files/tasks.csv");
+        File tasks = new File("src/main.files/main.tasks.csv");
 
-        System.out.println("Check that tasks from file are read correctly (and saved also)" + LINE_SEPARATOR);
+        System.out.println("Check that main.tasks from file are read correctly (and saved also)" + LINE_SEPARATOR);
         TaskManager manager = FileBackedTaskManager.loadFromFile(tasks);
         System.out.println(manager.getAllTasks());
         System.out.println(manager.getAllEpics());
         System.out.println(manager.getAllSubTasks());
         System.out.println(manager.getHistory());
 
-        System.out.println("Check that file is updated when we add some tasks via second manager" + LINE_SEPARATOR);
+        System.out.println("Check that file is updated when we add some main.tasks via second main.manager" + LINE_SEPARATOR);
         Task newTask = new Task("New task", "Some new task", TaskStatus.NEW);
         manager.addTask(newTask);
         EpicTask newEpic = new EpicTask("New epic", "Some new Epic");

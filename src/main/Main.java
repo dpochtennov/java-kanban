@@ -1,9 +1,11 @@
-import manager.Managers;
-import manager.taskManager.TaskManager;
-import tasks.EpicTask;
-import tasks.SubTask;
-import tasks.Task;
-import tasks.TaskStatus;
+package main;
+
+import main.manager.Managers;
+import main.manager.taskManager.TaskManager;
+import main.tasks.EpicTask;
+import main.tasks.SubTask;
+import main.tasks.Task;
+import main.tasks.TaskStatus;
 
 import java.util.List;
 

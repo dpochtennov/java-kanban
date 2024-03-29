@@ -1,6 +1,6 @@
-package manager.historyManager;
+package main.manager.historyManager;
 
-import tasks.Task;
+import main.tasks.Task;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,7 +23,7 @@ public interface HistoryManager {
     /**
      * This method returns the task history.
      *
-     * @return List<Task> returns tasks which were viewed by user.
+     * @return List<Task> returns main.tasks which were viewed by user.
      */
     List<Task> getHistory();
 

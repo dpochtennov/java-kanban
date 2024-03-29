@@ -1,4 +1,4 @@
-package customExceptions;
+package main.customExceptions;
 
 public class ManagerReadException extends RuntimeException {
     public ManagerReadException() {

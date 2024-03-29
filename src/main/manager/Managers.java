@@ -1,9 +1,9 @@
-package manager;
+package main.manager;
 
-import manager.historyManager.HistoryManager;
-import manager.historyManager.InMemoryHistoryManager;
-import manager.taskManager.InMemoryTaskManager;
-import manager.taskManager.TaskManager;
+import main.manager.historyManager.HistoryManager;
+import main.manager.historyManager.InMemoryHistoryManager;
+import main.manager.taskManager.InMemoryTaskManager;
+import main.manager.taskManager.TaskManager;
 
 /**
  * Managers class is the abstract factory for getting TaskManager object
