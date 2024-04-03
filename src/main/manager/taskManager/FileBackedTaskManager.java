@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -23,13 +25,15 @@ import static java.util.stream.Collectors.toList;
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private static final String COMMA_DELIMITER = ",";
-    private static final String HEADER_LINE = "id,type,name,status,description,epic";
+    private static final String HEADER_LINE = "id,type,name,status,description,epic,start_time,duration_min";
     private static final String LINE_SEPARATOR = System.lineSeparator();
     private static final int ID_POSITION = 0;
     private static final int NAME_POSITION = 2;
     private static final int STATUS_POSITION = 3;
     private static final int DESCRIPTION_POSITION = 4;
-    private static final int EPIC_ID_POSITION = 5;
+    private static final int START_TIME_POSITION = 5;
+    private static final int DURATION_POSITION = 6;
+    private static final int EPIC_ID_POSITION = 7;
 
     private final File tasksFile;
 
@@ -75,7 +79,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static void main(String[] args) {
-        File tasks = new File("src/main.files/main.tasks.csv");
+        File tasks = new File("src/main/files/tasks.csv");
 
         System.out.println("Check that main.tasks from file are read correctly (and saved also)" + LINE_SEPARATOR);
         TaskManager manager = FileBackedTaskManager.loadFromFile(tasks);
@@ -85,11 +89,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         System.out.println(manager.getHistory());
 
         System.out.println("Check that file is updated when we add some main.tasks via second main.manager" + LINE_SEPARATOR);
-        Task newTask = new Task("New task", "Some new task", TaskStatus.NEW);
+        Task newTask = new Task("New task", "Some new task", TaskStatus.NEW, LocalDateTime.MIN, Duration.ofMinutes(1));
         manager.addTask(newTask);
         EpicTask newEpic = new EpicTask("New epic", "Some new Epic");
         manager.addEpicTask(newEpic);
-        SubTask newSubTask = new SubTask("New subtask", "NewSubTask description", TaskStatus.NEW, newEpic.getId());
+        SubTask newSubTask = new SubTask("New subtask", "NewSubTask description", TaskStatus.NEW, newEpic.getId(), LocalDateTime.MIN, Duration.ofMinutes(1));
         manager.addSubTask(newSubTask);
         manager.getTaskById(newTask.getId());
         TaskManager secondManager = FileBackedTaskManager.loadFromFile(tasks);
@@ -112,10 +116,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             while ((line = br.readLine()) != null) {
                 records.add(line);
             }
-        } catch (IOException exception) {
+            return records.subList(1, records.size());
+        } catch (Exception exception) {
             throw new ManagerReadException("Cannot read file: " + exception.getMessage());
         }
-        return records.subList(1, records.size());
     }
 
     private static List<Task> serializeTasks(List<String> records) {
@@ -162,15 +166,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         TaskStatus status = TaskStatus.valueOf(values[STATUS_POSITION]);
         switch (type) {
             case SUBTASK: {
+                LocalDateTime startTime = LocalDateTime.parse(values[START_TIME_POSITION]);
+                Duration duration = Duration.ofMinutes(Long.parseLong(values[DURATION_POSITION]));
                 UUID epicId = UUID.fromString(values[EPIC_ID_POSITION]);
-                return new SubTask(id, name, description, status, epicId);
+                return new SubTask(id, name, description, status, epicId, startTime, duration);
             }
             case EPIC: {
                 List<UUID> subTaskIds = new ArrayList<>();
                 return new EpicTask(id, name, description, status, subTaskIds);
             }
             case TASK: {
-                return new Task(id, name, description, status);
+                LocalDateTime startTime = LocalDateTime.parse(values[START_TIME_POSITION]);
+                Duration duration = Duration.ofMinutes(Long.parseLong(values[DURATION_POSITION]));
+                return new Task(id, name, description, status, startTime, duration);
             }
             default: {
                 throw new RuntimeException("Incorrect task type in the line: " + line);

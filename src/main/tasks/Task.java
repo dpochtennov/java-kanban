@@ -1,5 +1,7 @@
 package main.tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class Task {
@@ -8,18 +10,31 @@ public class Task {
     private String name;
     private String description;
     private TaskStatus taskStatus;
+    private Duration duration;
+    private LocalDateTime startTime;
 
-    public Task(UUID id, String name, String description, TaskStatus taskStatus) {
+    public Task(
+        UUID id,
+        String name,
+        String description,
+        TaskStatus taskStatus,
+        LocalDateTime startTime,
+        Duration duration
+    ) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.taskStatus = taskStatus;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
-    public Task(String name, String description, TaskStatus taskStatus) {
+    public Task(String name, String description, TaskStatus taskStatus, LocalDateTime startTime, Duration duration) {
         this.name = name;
         this.description = description;
         this.taskStatus = taskStatus;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
     public String getName() {
@@ -58,8 +73,29 @@ public class Task {
         return type;
     }
 
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+    
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
+    }
+
     @Override
     public String toString() {
-        return getId() + "," + type + "," + getName() + "," + getTaskStatus() + "," + getDescription();
+        return getId() + "," + type + "," + getName() + "," + getTaskStatus() + "," + getDescription() + ","
+                + getStartTime() + "," + getDuration().toMinutes();
     }
 }

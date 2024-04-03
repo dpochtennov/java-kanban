@@ -3,6 +3,7 @@ package main.tasks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,6 +51,13 @@ class EpicTaskTest {
         assertEquals(List.of(randomSubtaskId), epicTask.getSubTaskIds());
         epicTask.clearSubTaskIds();
         assertEquals(List.of(), epicTask.getSubTaskIds());
+    }
+
+    @Test
+    void setEndTime() {
+        LocalDateTime expectedEndTime = LocalDateTime.MAX;
+        epicTask.setEndTime(expectedEndTime);
+        assertEquals(expectedEndTime, epicTask.getEndTime());
     }
 
     @Test

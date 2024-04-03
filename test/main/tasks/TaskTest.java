@@ -6,6 +6,9 @@ import main.tasks.TaskTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,10 +19,12 @@ class TaskTest {
     static String taskName = "SomeName";
     static String taskDescription = "SomeDescription";
     static TaskStatus taskStatus = TaskStatus.NEW;
+    static Duration taskDuration = Duration.ofMinutes(1);
+    static LocalDateTime startTime = LocalDateTime.MIN;
 
     @BeforeEach
     void beforeEach() {
-        task = new Task(taskId, taskName, taskDescription, taskStatus);
+        task = new Task(taskId, taskName, taskDescription, taskStatus, startTime, taskDuration);
     }
 
     @Test
@@ -71,6 +76,36 @@ class TaskTest {
     }
 
     @Test
+    void getStartTime() {
+        assertEquals(startTime, task.getStartTime());
+    }
+
+    @Test
+    void setStartTime() {
+        LocalDateTime newStartTime = LocalDateTime.MAX;
+        task.setStartTime(newStartTime);
+        assertEquals(newStartTime, task.getStartTime());
+    }
+
+    @Test
+    void getDuration() {
+        assertEquals(taskDuration, task.getDuration());
+    }
+
+    @Test
+    void setTaskDuration() {
+        Duration newTaskDuration = Duration.ofMinutes(200);
+        task.setDuration(newTaskDuration);
+        assertEquals(newTaskDuration, task.getDuration());
+    }
+
+    @Test
+    void getEndTime() {
+        LocalDateTime expectedEndTime = startTime.plus(taskDuration);
+        assertEquals(expectedEndTime, task.getEndTime());
+    }
+
+    @Test
     void getType() {
         assertEquals(TaskTypes.TASK, task.getType());
     }
@@ -78,7 +113,7 @@ class TaskTest {
     @Test
     void testToString() {
         String expectedString = taskId + "," + TaskTypes.TASK + "," + taskName + "," + taskStatus + ","
-                + taskDescription;
+                + taskDescription + "," + startTime + "," + taskDuration.toMinutes();
         assertEquals(expectedString, task.toString());
     }
 }
