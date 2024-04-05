@@ -19,7 +19,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class FileBackedTaskManagerTest extends TaskManagerTest {
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     private File tmpFile;
     private static final String CSV_FILE_HEADER = "id,type,name,status,description,epic,start_time,duration_min\n";
@@ -61,7 +61,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest {
     public void shouldReturnProperEpicTimeAfterFileLoad() {
         EpicTask epic = manager.addEpicTask(new EpicTask("First Epic", "Description"));
         manager.addSubTask(new SubTask("First subtask", "Description", TaskStatus.NEW, epic.getId(),
-                        LocalDateTime.MIN, Duration.ofMinutes(0)));
+                        LocalDateTime.MIN, Duration.ofMinutes(2)));
         manager.addSubTask(new SubTask("Second subtask", "Description", TaskStatus.NEW, epic.getId(),
                 LocalDateTime.MAX.minusMinutes(1), Duration.ofMinutes(1)));
         manager.getEpicTaskById(epic.getId());
@@ -69,7 +69,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest {
         TaskManager secondFileBackedTaskManager = FileBackedTaskManager.loadFromFile(tmpFile);
 
         EpicTask retrievedEpic = secondFileBackedTaskManager.getEpicTaskById(epic.getId());
-        assertEquals(Duration.between(LocalDateTime.MIN, LocalDateTime.MAX), retrievedEpic.getDuration());
+        assertEquals(Duration.ofMinutes(3), retrievedEpic.getDuration());
         assertEquals(LocalDateTime.MIN, retrievedEpic.getStartTime());
         assertEquals(LocalDateTime.MAX, retrievedEpic.getEndTime());
     }

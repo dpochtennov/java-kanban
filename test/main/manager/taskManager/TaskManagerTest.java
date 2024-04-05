@@ -14,7 +14,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-abstract class TaskManagerTest {
+abstract class TaskManagerTest<T extends TaskManager> {
 
     protected static TaskManager manager;
 
@@ -232,9 +232,9 @@ abstract class TaskManagerTest {
 
         LocalDateTime expectedStartTime = LocalDateTime.MIN;
         LocalDateTime expectedEndTime = LocalDateTime.MAX;
-        Duration expectedDuration = Duration.between(expectedStartTime, expectedEndTime);
+        Duration expectedDuration = Duration.ofMinutes(3);
         manager.addSubTask(new SubTask("First Subtask", "Description", TaskStatus.NEW, epic.getId(),
-                LocalDateTime.MIN, Duration.ofMinutes(0)));
+                LocalDateTime.MIN, Duration.ofMinutes(2)));
         manager.addSubTask(new SubTask("Second Subtask", "Description", TaskStatus.NEW, epic.getId(),
                 LocalDateTime.MAX.minusMinutes(1), Duration.ofMinutes(1)));
         assertEquals(expectedDuration, epic.getDuration());

@@ -19,7 +19,7 @@ public class Main {
 
         Task firstTask = new Task("First task", "Some first task", TaskStatus.NEW, LocalDateTime.MIN, Duration.ofMinutes(1));
         Task secondTask = new Task("Second task", "Some second task",
-                TaskStatus.NEW, LocalDateTime.MIN, Duration.ofMinutes(1));
+                TaskStatus.NEW, LocalDateTime.MIN.plusMinutes(10), Duration.ofMinutes(1));
         testManager.addTask(firstTask);
         testManager.addTask(secondTask);
 
@@ -29,11 +29,11 @@ public class Main {
         testManager.addEpicTask(secondEpic);
 
         SubTask firstSubTask = new SubTask("First subtask",
-                "FirstSubTask description", TaskStatus.NEW, firstEpic.getId(), LocalDateTime.MIN, Duration.ofMinutes(1));
+                "FirstSubTask description", TaskStatus.NEW, firstEpic.getId(), LocalDateTime.MIN.plusMinutes(15), Duration.ofMinutes(1));
         SubTask secondSubTask = new SubTask("Second subtask",
-                "SecondSubTask description", TaskStatus.NEW, firstEpic.getId(), LocalDateTime.MIN, Duration.ofMinutes(1));
+                "SecondSubTask description", TaskStatus.NEW, firstEpic.getId(), LocalDateTime.MIN.plusMinutes(20), Duration.ofMinutes(1));
         SubTask thirdSubTask = new SubTask("Third subtask",
-                "ThirdSubTask description", TaskStatus.NEW, secondEpic.getId(), LocalDateTime.MIN, Duration.ofMinutes(1));
+                "ThirdSubTask description", TaskStatus.NEW, secondEpic.getId(), LocalDateTime.MIN.plusMinutes(25), Duration.ofMinutes(1));
         testManager.addSubTask(firstSubTask);
         testManager.addSubTask(secondSubTask);
         testManager.addSubTask(thirdSubTask);
@@ -48,7 +48,7 @@ public class Main {
         Task firstTaskUpdated = new Task(firstTask.getId(), "First task updated",
                 "Some first task updated", TaskStatus.DONE, LocalDateTime.MIN, Duration.ofMinutes(1));
         Task secondTaskUpdated = new Task(secondTask.getId(), "Second task updated",
-                "Some second task updated", TaskStatus.IN_PROGRESS, LocalDateTime.MIN, Duration.ofMinutes(1));
+                "Some second task updated", TaskStatus.IN_PROGRESS, LocalDateTime.MIN.plusMinutes(10), Duration.ofMinutes(1));
         testManager.updateTask(firstTaskUpdated);
         testManager.updateTask(secondTaskUpdated);
         System.out.println("Tasks: " + testManager.getAllTasks());
@@ -56,9 +56,9 @@ public class Main {
         System.out.println();
         System.out.println("Check updateSubTask method");
         SubTask firstSubTaskUpdated = new SubTask(firstSubTask.getId(), "First subtask updated",
-                "FirstSubTask description updated", TaskStatus.IN_PROGRESS, firstEpic.getId(), LocalDateTime.MIN, Duration.ofMinutes(1));
+                "FirstSubTask description updated", TaskStatus.IN_PROGRESS, firstEpic.getId(), LocalDateTime.MIN.plusMinutes(15), Duration.ofMinutes(1));
         SubTask secondSubTaskUpdated = new SubTask(secondSubTask.getId(), "Second subTask updated",
-                "SecondSubTask description updated", TaskStatus.DONE, firstEpic.getId(), LocalDateTime.MIN, Duration.ofMinutes(1));
+                "SecondSubTask description updated", TaskStatus.DONE, firstEpic.getId(), LocalDateTime.MIN.plusMinutes(25), Duration.ofMinutes(1));
         testManager.updateSubTask(firstSubTaskUpdated);
         testManager.updateSubTask(secondSubTaskUpdated);
         System.out.println("SubTasks: " + testManager.getAllSubTasks());

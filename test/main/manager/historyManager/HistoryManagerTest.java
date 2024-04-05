@@ -14,7 +14,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-abstract class HistoryManagerTest {
+abstract class HistoryManagerTest<T extends HistoryManager>  {
 
     protected static HistoryManager manager;
 

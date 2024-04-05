@@ -10,6 +10,7 @@ import main.tasks.TaskStatus;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     private final Map<UUID, Task> tasks = new HashMap<>();
@@ -47,6 +48,8 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (tasks.containsKey(task.getId())) {
             tasks.put(task.getId(), task);
+            prioritizedTasks.remove(task);
+            prioritizedTasks.add(task);
         }
         return task;
     }
@@ -125,6 +128,8 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             throw new RuntimeException("There is no epic for this subtask!");
         }
+        prioritizedTasks.remove(subTask);
+        prioritizedTasks.add(subTask);
         return subTask;
     }
 
@@ -196,6 +201,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (id != null && epicTasks.containsKey(id)) {
             EpicTask epic = epicTasks.get(id);
             for (UUID subTaskId : epic.getSubTaskIds()) {
+                prioritizedTasks.remove(subTasks.get(subTaskId));
                 subTasks.remove(subTaskId);
                 historyManager.remove(subTaskId);
             }
@@ -206,12 +212,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearEpicTaskLists() {
-        Set<UUID> idsToDeleteFromHistory = new HashSet<>();
-        idsToDeleteFromHistory.addAll(subTasks.keySet());
-        idsToDeleteFromHistory.addAll(epicTasks.keySet());
-        for (UUID taskId : idsToDeleteFromHistory) {
-            historyManager.remove(taskId);
-        }
+        subTasks.forEach((key, value) -> {
+            historyManager.remove(key);
+            prioritizedTasks.remove(value);
+        });
+        epicTasks.keySet().forEach(historyManager::remove);
         epicTasks.clear();
         subTasks.clear();
     }
@@ -313,17 +318,17 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        LocalDateTime minStartTime = subTasks.values().stream()
-                .filter(subTask -> subTask.getEpicId().equals(epic.getId()))
-                .map(SubTask::getEndTime)
+        List<SubTask> subTasksOfEpic = epic.getSubTaskIds().stream().map(subTasks::get).collect(Collectors.toList());
+
+        LocalDateTime minStartTime = subTasksOfEpic.stream()
+                .map(SubTask::getStartTime)
                 .min(LocalDateTime::compareTo)
                 .orElseThrow(NoSuchElementException::new);
-        LocalDateTime maxEndTime = subTasks.values().stream()
-                .filter(subTask -> subTask.getEpicId().equals(epic.getId()))
+        LocalDateTime maxEndTime = subTasksOfEpic.stream()
                 .map(SubTask::getEndTime)
                 .max(LocalDateTime::compareTo)
                 .orElseThrow(NoSuchElementException::new);
-        Duration duration = Duration.between(minStartTime, maxEndTime);
+        Duration duration = subTasksOfEpic.stream().map(SubTask::getDuration).reduce(Duration.ZERO, Duration::plus);
         epic.setStartTime(minStartTime);
         epic.setEndTime(maxEndTime);
         epic.setDuration(duration);
