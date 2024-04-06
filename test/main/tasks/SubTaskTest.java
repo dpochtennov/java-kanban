@@ -3,6 +3,8 @@ package main.tasks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,10 +17,12 @@ class SubTaskTest {
     static String subTaskName = "SomeName";
     static String subTaskDescription = "SomeDescription";
     static TaskStatus subTaskStatus = TaskStatus.NEW;
+    static Duration taskDuration = Duration.ofHours(1);
+    static LocalDateTime startTime = LocalDateTime.MIN;
 
     @BeforeEach
     void beforeEach() {
-        subTask = new SubTask(subTaskId, subTaskName, subTaskDescription, subTaskStatus, epicId);
+        subTask = new SubTask(subTaskId, subTaskName, subTaskDescription, subTaskStatus, epicId, startTime, taskDuration);
     }
 
     @Test
@@ -34,7 +38,7 @@ class SubTaskTest {
     @Test
     void testToString() {
         String expectedString = subTaskId + "," + TaskTypes.SUBTASK + "," + subTaskName + "," + subTaskStatus + ","
-                + subTaskDescription + "," + epicId;
+                + subTaskDescription + "," + startTime + "," + taskDuration.toMinutes() + "," + epicId;
         assertEquals(expectedString, subTask.toString());
     }
 }

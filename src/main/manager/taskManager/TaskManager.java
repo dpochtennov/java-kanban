@@ -159,4 +159,11 @@ public interface TaskManager {
      * @return List<Task> history of last 10 retrieval operations.
      */
     List<Task> getHistory();
+
+    /**
+     * Returns list of tasks in ordered by startTime.
+     *
+     * @return List<Task> list of tasks ordered by startTime.
+     */
+    List<Task> getPrioritizedTasks();
 }

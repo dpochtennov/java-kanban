@@ -4,26 +4,31 @@ import main.tasks.EpicTask;
 import main.tasks.SubTask;
 import main.tasks.Task;
 import main.tasks.TaskStatus;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-abstract class TaskManagerTest {
+abstract class TaskManagerTest<T extends TaskManager> {
 
     protected static TaskManager manager;
 
     @Test
     void addTask() {
-        Task addedTask = manager.addTask(new Task("First task", "Some first task", TaskStatus.NEW));
+        Task addedTask = manager.addTask(new Task("First task", "Some first task", TaskStatus.NEW,
+                LocalDateTime.MIN, Duration.ofMinutes(1)));
         assertEquals(List.of(addedTask), manager.getAllTasks());
     }
 
     @Test
     void updateTask() {
-        Task addedTask = manager.addTask(new Task("First task", "Some first task", TaskStatus.NEW));
+        Task addedTask = manager.addTask(new Task("First task", "Some first task", TaskStatus.NEW,
+                LocalDateTime.MIN, Duration.ofMinutes(1)));
         String expectedNewDescription = "Updated task";
         addedTask.setDescription(expectedNewDescription);
         manager.updateTask(addedTask);
@@ -34,14 +39,16 @@ abstract class TaskManagerTest {
     @Test
     void doNotUpdateNonAddedTask() {
         Task nonAddedTask = new Task(
-                UUID.randomUUID(), "First task", "Some first task", TaskStatus.NEW);
+                UUID.randomUUID(), "First task", "Some first task", TaskStatus.NEW,
+                LocalDateTime.MIN, Duration.ofMinutes(1));
         manager.updateTask(nonAddedTask);
         assertEquals(List.of(), manager.getAllTasks());
     }
 
     @Test
     void removeTaskById() {
-        Task addedTask = manager.addTask(new Task("First task", "Some first task", TaskStatus.NEW));
+        Task addedTask = manager.addTask(new Task("First task", "Some first task", TaskStatus.NEW,
+                LocalDateTime.MIN, Duration.ofMinutes(1)));
         assertEquals(List.of(addedTask), manager.getAllTasks());
         manager.removeTaskById(addedTask.getId());
         assertEquals(List.of(), manager.getAllTasks());
@@ -49,23 +56,28 @@ abstract class TaskManagerTest {
 
     @Test
     void clearTaskList() {
-        manager.addTask(new Task("First task", "Some first task", TaskStatus.NEW));
-        manager.addTask(new Task("Second task", "Some first task", TaskStatus.NEW));
+        manager.addTask(new Task("First task", "Some first task", TaskStatus.NEW, LocalDateTime.MIN,
+                Duration.ofMinutes(1)));
+        manager.addTask(new Task("Second task", "Some first task", TaskStatus.NEW, LocalDateTime.MIN,
+                Duration.ofMinutes(1)));
         manager.clearTaskList();
         assertEquals(List.of(), manager.getAllTasks());
     }
 
     @Test
     void getTaskById() {
-        Task addedTask = manager.addTask(new Task("First task", "Some first task", TaskStatus.NEW));
+        Task addedTask = manager.addTask(new Task("First task", "Some first task", TaskStatus.NEW,
+                LocalDateTime.MIN, Duration.ofMinutes(1)));
         assertEquals(addedTask, manager.getTaskById(addedTask.getId()));
     }
 
     @Test
     void getAllTasks() {
-        Task firstAddedTask = manager.addTask(new Task("First task", "Some first task", TaskStatus.NEW));
+        Task firstAddedTask = manager.addTask(new Task("First task", "Some first task", TaskStatus.NEW,
+                LocalDateTime.MIN, Duration.ofMinutes(1)));
         Task secondAddedTask = manager.addTask(
-                new Task("Second task", "Some first task", TaskStatus.NEW));
+                new Task("Second task", "Some first task", TaskStatus.NEW, LocalDateTime.MIN,
+                        Duration.ofMinutes(1)));
         List<Task> expected = List.of(firstAddedTask, secondAddedTask);
         assertTrue(expected.containsAll(manager.getAllTasks()));
     }
@@ -74,7 +86,8 @@ abstract class TaskManagerTest {
     void addSubTask() {
         EpicTask epicTask = manager.addEpicTask(new EpicTask("First Epic", "First Epic description"));
         SubTask addedSubTask = manager.addSubTask(
-                new SubTask("First sub task", "Some first subtask", TaskStatus.NEW, epicTask.getId()));
+                new SubTask("First sub task", "Some first subtask", TaskStatus.NEW, epicTask.getId(),
+                        LocalDateTime.MIN, Duration.ofMinutes(1)));
         assertEquals(addedSubTask, manager.getSubTaskById(addedSubTask.getId()));
     }
 
@@ -82,7 +95,8 @@ abstract class TaskManagerTest {
     void updateSubTask() {
         EpicTask epicTask = manager.addEpicTask(new EpicTask("First Epic", "First Epic description"));
         SubTask addedSubTask = manager.addSubTask(
-                new SubTask("First sub task", "Some first subtask", TaskStatus.NEW, epicTask.getId()));
+                new SubTask("First sub task", "Some first subtask", TaskStatus.NEW, epicTask.getId(),
+                        LocalDateTime.MIN, Duration.ofMinutes(1)));
         addedSubTask.setTaskStatus(TaskStatus.IN_PROGRESS);
         manager.updateSubTask(addedSubTask);
         assertEquals(TaskStatus.IN_PROGRESS, manager.getSubTaskById(addedSubTask.getId()).getTaskStatus());
@@ -92,7 +106,8 @@ abstract class TaskManagerTest {
     void removeSubTaskById() {
         EpicTask epicTask = manager.addEpicTask(new EpicTask("First Epic", "First Epic description"));
         SubTask addedSubTask = manager.addSubTask(
-                new SubTask("First sub task", "Some first subtask", TaskStatus.NEW, epicTask.getId()));
+                new SubTask("First sub task", "Some first subtask", TaskStatus.NEW, epicTask.getId(),
+                        LocalDateTime.MIN, Duration.ofMinutes(1)));
         manager.removeSubTaskById(addedSubTask.getId());
         assertEquals(List.of(), manager.getAllSubTasks());
     }
@@ -101,9 +116,11 @@ abstract class TaskManagerTest {
     void clearSubTaskLists() {
         EpicTask epicTask = manager.addEpicTask(new EpicTask("First Epic", "First Epic description"));
         manager.addSubTask(
-                new SubTask("First sub task", "First subtask", TaskStatus.NEW, epicTask.getId()));
+                new SubTask("First sub task", "First subtask", TaskStatus.NEW, epicTask.getId(),
+                        LocalDateTime.MIN, Duration.ofMinutes(1)));
         manager.addSubTask(
-                new SubTask("Second subtask", "Second subtask", TaskStatus.NEW, epicTask.getId()));
+                new SubTask("Second subtask", "Second subtask", TaskStatus.NEW, epicTask.getId(),
+                        LocalDateTime.MIN, Duration.ofMinutes(1)));
         manager.clearSubTaskLists();
         assertEquals(List.of(), manager.getAllSubTasks());
     }
@@ -112,7 +129,8 @@ abstract class TaskManagerTest {
     void getSubTaskById() {
         EpicTask epicTask = manager.addEpicTask(new EpicTask("First Epic", "First Epic description"));
         SubTask addedSubTask = manager.addSubTask(
-                new SubTask("First sub task", "Some first subtask", TaskStatus.NEW, epicTask.getId()));
+                new SubTask("First sub task", "Some first subtask", TaskStatus.NEW, epicTask.getId(),
+                        LocalDateTime.MIN, Duration.ofMinutes(1)));
         assertEquals(addedSubTask, manager.getSubTaskById(addedSubTask.getId()));
     }
 
@@ -120,9 +138,11 @@ abstract class TaskManagerTest {
     void getAllSubTasks() {
         EpicTask epicTask = manager.addEpicTask(new EpicTask("First Epic", "First Epic description"));
         SubTask first = manager.addSubTask(
-                new SubTask("First sub task", "First subtask", TaskStatus.NEW, epicTask.getId()));
+                new SubTask("First sub task", "First subtask", TaskStatus.NEW, epicTask.getId(),
+                        LocalDateTime.MIN, Duration.ofMinutes(1)));
         SubTask second = manager.addSubTask(
-                new SubTask("Second subtask", "Second subtask", TaskStatus.NEW, epicTask.getId()));
+                new SubTask("Second subtask", "Second subtask", TaskStatus.NEW, epicTask.getId(),
+                        LocalDateTime.MIN, Duration.ofMinutes(1)));
         assertTrue(List.of(first, second).containsAll(manager.getAllSubTasks()));
     }
 
@@ -169,9 +189,11 @@ abstract class TaskManagerTest {
         EpicTask epicTask = manager.addEpicTask(new EpicTask("First Epic", "First Epic description"));
         assertEquals(List.of(), manager.getSubtasksOfEpic(epicTask.getId()));
         SubTask first = manager.addSubTask(
-                new SubTask("First sub task", "First subtask", TaskStatus.NEW, epicTask.getId()));
+                new SubTask("First sub task", "First subtask", TaskStatus.NEW, epicTask.getId(),
+                        LocalDateTime.MIN, Duration.ofMinutes(1)));
         SubTask second = manager.addSubTask(
-                new SubTask("Second subtask", "Second subtask", TaskStatus.NEW, epicTask.getId()));
+                new SubTask("Second subtask", "Second subtask", TaskStatus.NEW, epicTask.getId(),
+                        LocalDateTime.MIN.plusMinutes(100), Duration.ofMinutes(1)));
         assertEquals(List.of(first, second), manager.getSubtasksOfEpic(epicTask.getId()));
     }
 
@@ -185,9 +207,10 @@ abstract class TaskManagerTest {
     @Test
     void getHistory() {
         EpicTask epicTask = manager.addEpicTask(new EpicTask("First Epic", "First Epic description"));
-        Task task = manager.addTask(new Task("Second Epic", "Second Epic", TaskStatus.NEW));
-        SubTask subTask =  manager.addSubTask(
-                new SubTask("First sub task", "First subtask", TaskStatus.NEW, epicTask.getId()));
+        Task task = manager.addTask(new Task("Second Epic", "Second Epic", TaskStatus.NEW,
+                LocalDateTime.MIN, Duration.ofMinutes(1)));
+        SubTask subTask =  manager.addSubTask(new SubTask("First sub task", "First subtask",
+                TaskStatus.NEW, epicTask.getId(), LocalDateTime.MIN.plusMinutes(100), Duration.ofMinutes(1)));
         manager.getTaskById(task.getId());
         manager.getSubTaskById(subTask.getId());
         manager.getEpicTaskById(epicTask.getId());
@@ -198,5 +221,32 @@ abstract class TaskManagerTest {
         assertEquals(List.of(epicTask), manager.getHistory());
         manager.clearEpicTaskLists();
         assertEquals(List.of(), manager.getHistory());
+    }
+
+    @Test
+    void shouldReturnCorrectEpicTimeData() {
+        EpicTask epic = manager.addEpicTask(new EpicTask("First Epic", "Epic Description"));
+        assertNull(epic.getDuration());
+        assertNull(epic.getStartTime());
+        assertNull(epic.getEndTime());
+
+        LocalDateTime expectedStartTime = LocalDateTime.MIN;
+        LocalDateTime expectedEndTime = LocalDateTime.MAX;
+        Duration expectedDuration = Duration.ofMinutes(3);
+        manager.addSubTask(new SubTask("First Subtask", "Description", TaskStatus.NEW, epic.getId(),
+                LocalDateTime.MIN, Duration.ofMinutes(2)));
+        manager.addSubTask(new SubTask("Second Subtask", "Description", TaskStatus.NEW, epic.getId(),
+                LocalDateTime.MAX.minusMinutes(1), Duration.ofMinutes(1)));
+        assertEquals(expectedDuration, epic.getDuration());
+    }
+
+    @Test
+    void shouldNotAddTaskIfItIntersects() {
+        Task firstTask = manager.addTask(new Task("First Task", "Description", TaskStatus.NEW,
+                LocalDateTime.MIN, Duration.ofMinutes(100)));
+        manager.addTask(new Task("Second Task", "Description", TaskStatus.NEW, LocalDateTime.MIN,
+                Duration.ofMinutes(50)));
+        assertEquals(1, manager.getPrioritizedTasks().size());
+        assertEquals(firstTask, manager.getTaskById(firstTask.getId()));
     }
 }
