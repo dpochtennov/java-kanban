@@ -118,7 +118,7 @@ public class InMemoryTaskManager implements TaskManager {
         removePrioritizedTaskById(subTask.getId());
 
         if (isTaskIntersected(subTask)) {
-            return subTask;
+            throw new TaskIntersectedException("Task times intersect with already added tasks");
         }
 
         UUID subTaskId = subTask.getId();
