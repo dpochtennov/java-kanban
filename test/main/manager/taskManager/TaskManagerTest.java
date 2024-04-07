@@ -1,10 +1,10 @@
 package main.manager.taskManager;
 
+import main.customExceptions.TaskIntersectedException;
 import main.tasks.EpicTask;
 import main.tasks.SubTask;
 import main.tasks.Task;
 import main.tasks.TaskStatus;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -58,8 +58,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void clearTaskList() {
         manager.addTask(new Task("First task", "Some first task", TaskStatus.NEW, LocalDateTime.MIN,
                 Duration.ofMinutes(1)));
-        manager.addTask(new Task("Second task", "Some first task", TaskStatus.NEW, LocalDateTime.MIN,
-                Duration.ofMinutes(1)));
+        manager.addTask(new Task("Second task", "Some first task", TaskStatus.NEW,
+                LocalDateTime.MIN.plusMinutes(10), Duration.ofMinutes(1)));
         manager.clearTaskList();
         assertEquals(List.of(), manager.getAllTasks());
     }
@@ -76,8 +76,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Task firstAddedTask = manager.addTask(new Task("First task", "Some first task", TaskStatus.NEW,
                 LocalDateTime.MIN, Duration.ofMinutes(1)));
         Task secondAddedTask = manager.addTask(
-                new Task("Second task", "Some first task", TaskStatus.NEW, LocalDateTime.MIN,
-                        Duration.ofMinutes(1)));
+                new Task("Second task", "Some first task", TaskStatus.NEW,
+                        LocalDateTime.MIN.plusMinutes(10), Duration.ofMinutes(1)));
         List<Task> expected = List.of(firstAddedTask, secondAddedTask);
         assertTrue(expected.containsAll(manager.getAllTasks()));
     }
@@ -117,7 +117,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         EpicTask epicTask = manager.addEpicTask(new EpicTask("First Epic", "First Epic description"));
         manager.addSubTask(
                 new SubTask("First sub task", "First subtask", TaskStatus.NEW, epicTask.getId(),
-                        LocalDateTime.MIN, Duration.ofMinutes(1)));
+                        LocalDateTime.MIN.plusMinutes(10), Duration.ofMinutes(1)));
         manager.addSubTask(
                 new SubTask("Second subtask", "Second subtask", TaskStatus.NEW, epicTask.getId(),
                         LocalDateTime.MIN, Duration.ofMinutes(1)));
@@ -139,7 +139,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         EpicTask epicTask = manager.addEpicTask(new EpicTask("First Epic", "First Epic description"));
         SubTask first = manager.addSubTask(
                 new SubTask("First sub task", "First subtask", TaskStatus.NEW, epicTask.getId(),
-                        LocalDateTime.MIN, Duration.ofMinutes(1)));
+                        LocalDateTime.MIN.plusMinutes(10), Duration.ofMinutes(1)));
         SubTask second = manager.addSubTask(
                 new SubTask("Second subtask", "Second subtask", TaskStatus.NEW, epicTask.getId(),
                         LocalDateTime.MIN, Duration.ofMinutes(1)));
@@ -244,8 +244,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void shouldNotAddTaskIfItIntersects() {
         Task firstTask = manager.addTask(new Task("First Task", "Description", TaskStatus.NEW,
                 LocalDateTime.MIN, Duration.ofMinutes(100)));
-        manager.addTask(new Task("Second Task", "Description", TaskStatus.NEW, LocalDateTime.MIN,
-                Duration.ofMinutes(50)));
+        assertThrows(TaskIntersectedException.class, () -> {
+            manager.addTask(new Task("Second Task", "Description", TaskStatus.NEW, LocalDateTime.MIN,
+                    Duration.ofMinutes(50)));
+        });
         assertEquals(1, manager.getPrioritizedTasks().size());
         assertEquals(firstTask, manager.getTaskById(firstTask.getId()));
     }
