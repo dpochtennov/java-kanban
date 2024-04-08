@@ -2,6 +2,7 @@ package main.api.handlers;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import main.api.HttpMethods;
 import main.customExceptions.NoSubTaskEpicException;
 import main.customExceptions.TaskIntersectedException;
 import main.manager.taskManager.TaskManager;
@@ -19,16 +20,16 @@ public class SubTasksHandler extends HttpTaskHandler {
     public void handle(HttpExchange exchange) {
         try {
             String path = exchange.getRequestURI().toString();
-            String requestMethod = exchange.getRequestMethod();
+            HttpMethods requestMethod = HttpMethods.valueOf(exchange.getRequestMethod());
             logRequest(requestMethod, path);
             switch (requestMethod) {
-                case "GET":
+                case GET:
                     handleGetRequest(path, exchange);
                     break;
-                case "POST":
+                case POST:
                     handlePostRequest(path, exchange);
                     break;
-                case "DELETE":
+                case DELETE:
                     handleDeleteRequest(path, exchange);
                     break;
                 default:
@@ -75,7 +76,7 @@ public class SubTasksHandler extends HttpTaskHandler {
             writeResponse(exchange, "Can not be added due to validation constrains", 406);
         } catch (NoSubTaskEpicException exception) {
             writeResponse(exchange, "No subtask epic exists", 406);
-        } catch (Exception exception) {
+        } catch (Throwable exception) {
             writeResponse(exchange, "Server-side error: " + exception.getMessage(), 500);
         }
     }

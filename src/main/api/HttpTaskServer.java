@@ -47,10 +47,10 @@ public class HttpTaskServer {
             server.createContext("/epics", new EpicTasksHandler(manager, gson));
             server.createContext("/history", new TaskHistoryHandler(manager, gson));
             server.createContext("/prioritized", new PrioritizedTasksHandler(manager, gson));
-            System.out.println("Starting server on port: " + HTTP_PORT);
+            System.out.printf("Starting server on port: %d%n", HTTP_PORT);
             server.start();
         } catch (Exception e) {
-            System.out.println("Failure during server start: " + e.getMessage());
+            System.out.printf("Failure during server start: %s%n", e.getMessage());
         }
     }
 

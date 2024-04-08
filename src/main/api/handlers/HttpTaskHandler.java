@@ -3,6 +3,7 @@ package main.api.handlers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import main.api.HttpMethods;
 import main.manager.taskManager.TaskManager;
 
 import java.io.IOException;
@@ -23,7 +24,7 @@ public abstract class HttpTaskHandler implements HttpHandler {
     protected void writeResponse(HttpExchange exchange,
                                String responseString,
                                int responseCode) throws IOException {
-        System.out.println("Responding with " + responseCode + " and body " + responseString);
+        System.out.printf("Responding with %s and body %s%n", responseCode, responseString);
         try (OutputStream os = exchange.getResponseBody()) {
             exchange.sendResponseHeaders(responseCode, 0);
             os.write(responseString.getBytes(DEFAULT_CHARSET));
@@ -31,8 +32,8 @@ public abstract class HttpTaskHandler implements HttpHandler {
         exchange.close();
     }
 
-    protected void logRequest(String method, String path) {
-        System.out.println("Incoming HTTP request with " + method + " method, path: " + path);
+    protected void logRequest(HttpMethods method, String path) {
+        System.out.printf("Incoming HTTP request with %s method, path: %s%n", method.name(), path);
     }
 
     protected void handleUnsupportedRequest(HttpExchange exchange) throws IOException {

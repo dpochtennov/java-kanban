@@ -2,6 +2,7 @@ package main.api.handlers;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import main.api.HttpMethods;
 import main.customExceptions.TaskIntersectedException;
 import main.manager.taskManager.TaskManager;
 import main.tasks.Task;
@@ -19,16 +20,16 @@ public class TasksHandler extends HttpTaskHandler {
     public void handle(HttpExchange exchange) {
         try {
             String path = exchange.getRequestURI().toString();
-            String requestMethod = exchange.getRequestMethod();
+            HttpMethods requestMethod = HttpMethods.valueOf(exchange.getRequestMethod());
             logRequest(requestMethod, path);
             switch (requestMethod) {
-                case "GET":
+                case GET:
                     handleGetRequest(path, exchange);
                     break;
-                case "POST":
+                case POST:
                     handlePostRequest(path, exchange);
                     break;
-                case "DELETE":
+                case DELETE:
                     handleDeleteRequest(path, exchange);
                     break;
                 default:
@@ -51,7 +52,6 @@ public class TasksHandler extends HttpTaskHandler {
         try {
             UUID taskId = UUID.fromString(pathElements[2]);
             Task task = taskManager.getTaskById(taskId);
-            System.out.println(task);
             String response = gson.toJson(task);
             writeResponse(exchange, response, 200);
         } catch (RuntimeException exception) {

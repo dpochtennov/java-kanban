@@ -2,7 +2,7 @@ package main.api.handlers;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
-import main.customExceptions.TaskIntersectedException;
+import main.api.HttpMethods;
 import main.manager.taskManager.TaskManager;
 import main.tasks.EpicTask;
 
@@ -18,16 +18,16 @@ public class EpicTasksHandler extends HttpTaskHandler {
     public void handle(HttpExchange exchange) {
         try {
             String path = exchange.getRequestURI().toString();
-            String requestMethod = exchange.getRequestMethod();
+            HttpMethods requestMethod = HttpMethods.valueOf(exchange.getRequestMethod());
             logRequest(requestMethod, path);
             switch (requestMethod) {
-                case "GET":
+                case GET:
                     handleGetRequest(path, exchange);
                     break;
-                case "POST":
+                case POST:
                     handlePostRequest(path, exchange);
                     break;
-                case "DELETE":
+                case DELETE:
                     handleDeleteRequest(path, exchange);
                     break;
                 default:
