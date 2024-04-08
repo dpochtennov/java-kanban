@@ -1,5 +1,7 @@
 package main.manager.taskManager;
 
+import main.customExceptions.NoSubTaskEpicException;
+import main.customExceptions.TaskIntersectedException;
 import main.manager.Managers;
 import main.manager.historyManager.HistoryManager;
 import main.tasks.EpicTask;
@@ -26,7 +28,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Task addTask(Task task) {
 
         if (isTaskIntersected(task)) {
-            return task;
+            throw new TaskIntersectedException("Task times intersect with already added tasks");
         }
 
         UUID id = task.getId();
@@ -41,14 +43,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task updateTask(Task task) {
-
+        removePrioritizedTaskById(task.getId());
         if (isTaskIntersected(task)) {
-            return task;
+            throw new TaskIntersectedException("Task times intersect with already added tasks");
         }
 
         if (tasks.containsKey(task.getId())) {
             tasks.put(task.getId(), task);
-            prioritizedTasks.remove(task);
             prioritizedTasks.add(task);
         }
         return task;
@@ -91,7 +92,7 @@ public class InMemoryTaskManager implements TaskManager {
     public SubTask addSubTask(SubTask subTask) {
 
         if (isTaskIntersected(subTask)) {
-            return subTask;
+            throw new TaskIntersectedException("Task times intersect with already added tasks");
         }
 
         UUID subTaskId = subTask.getId();
@@ -99,14 +100,14 @@ public class InMemoryTaskManager implements TaskManager {
             subTaskId = UUID.randomUUID();
             subTask.setId(subTaskId);
         }
-        subTasks.put(subTaskId, subTask);
         EpicTask epic = epicTasks.get(subTask.getEpicId());
         if (epic != null) {
+            subTasks.put(subTaskId, subTask);
             epic.addSubTaskId(subTaskId);
             recalculateEpicData(epic);
             prioritizedTasks.add(subTask);
         } else {
-            throw new RuntimeException("There is no epic for this subtask!");
+            throw new NoSubTaskEpicException("There is no epic for this subtask!");
         }
         return subTask;
     }
@@ -114,8 +115,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public SubTask updateSubTask(SubTask subTask) {
 
+        removePrioritizedTaskById(subTask.getId());
+
         if (isTaskIntersected(subTask)) {
-            return subTask;
+            throw new TaskIntersectedException("Task times intersect with already added tasks");
         }
 
         UUID subTaskId = subTask.getId();
@@ -128,7 +131,6 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             throw new RuntimeException("There is no epic for this subtask!");
         }
-        prioritizedTasks.remove(subTask);
         prioritizedTasks.add(subTask);
         return subTask;
     }
@@ -348,5 +350,11 @@ public class InMemoryTaskManager implements TaskManager {
                     (task.getStartTime().isAfter(startTime) && task.getStartTime().isBefore(endTime))
                 );
             });
+    }
+
+    private void removePrioritizedTaskById(UUID id) {
+        Optional<Task> taskBeforeUpdate = prioritizedTasks.stream()
+                .filter(nonUpdatedTask -> nonUpdatedTask.getId().equals(id)).findFirst();
+        taskBeforeUpdate.ifPresent(prioritizedTasks::remove);
     }
 }
